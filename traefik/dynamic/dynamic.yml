@@ -5,10 +5,10 @@ http:
       entryPoints:
         - web
       service: url-shortener
-      rule: Host(`api.docker.localhost`)
+      rule: Host(`api.localhost`)
     whoami:
       service: whoami
-      rule: Host(`whoami.docker.localhost`)
+      rule: Host(`whoami.localhost`)
 
   # Add the middleware
   middlewares:

@@ -65,9 +65,9 @@ public class ShortenedUrlService {
         String serverScheme = req.getScheme();
 
         if (serverPort == 80 || serverPort == 443 || serverPort == -1) {
-            return serverScheme + "://" + serverHost + "/";
+            return serverScheme + "://" + serverHost + "/li/";
         } else {
-            return serverScheme + "://" + serverHost + ":" + serverPort + "/";
+            return serverScheme + "://" + serverHost + ":" + serverPort + "/li/";
         }
     }
 
