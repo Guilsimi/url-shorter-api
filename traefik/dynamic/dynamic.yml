@@ -1,0 +1,29 @@
+http:
+  # Add the router
+  routers:
+    url-shortener:
+      entryPoints:
+        - web
+      service: url-shortener
+      rule: Host(`api.docker.localhost`)
+    whoami:
+      service: whoami
+      rule: Host(`whoami.docker.localhost`)
+
+  # Add the middleware
+  middlewares:
+    rate-limit:
+      rateLimit:
+        average: 100
+        burst: 50
+
+  # Add the service
+  services:
+    url-shortener:
+      loadBalancer:
+        servers:
+          - url: http://url-shortener:8000
+    whoami:
+      loadBalancer:
+        servers:
+          - url: http://whoami

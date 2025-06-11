@@ -1,0 +1,96 @@
+services:
+  reverse-proxy:
+    image: traefik:v3.4
+    networks:
+      - traefiknet
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml
+      - ./traefik/dynamic/dynamic.yml:/etc/traefik/dynamic/dynamic.yml
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --configFile=/etc/traefik/traefik.yml
+
+  url-shortener:
+    image: openjdk:17
+    volumes:
+      - ./ls-api/target/ls-api-0.0.1-SNAPSHOT.jar:/ls-api.jar
+    command: java -jar /ls-api.jar
+    networks:
+      - traefiknet
+    environment:
+      MYSQL_USERNAME: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASS}
+      MYSQL_URL: jdbc:mysql://db:${MYSQL_PORT}/${DATABASE}
+      MONGO_PORT: ${MONGO_PORT}
+      MONGODB_URL: mongodb://${MONGO_USER}:${MONGO_PASS}@mongo:${MONGO_PORT}/${DATABASE}?authSource=admin
+    depends_on:
+      db:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+
+  whoami:
+    image: traefik/whoami
+    networks:
+      - traefiknet
+
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASS}
+      MYSQL_DATABASE: ${DATABASE}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    networks:
+      - traefiknet
+
+  mongo:
+    image: mongo
+    restart: always
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: mongosh --eval "db.runCommand('ping').ok" --quiet
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASS}
+      MONGO_INITDB_DATABASE: ${DATABASE}
+    networks:
+      - traefiknet
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USER}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASS}
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_USER}:${MONGO_PASS}@mongo:${MONGO_PORT}/${DATABASE}?authSource=admin
+      ME_CONFIG_BASICAUTH: false
+    networks:
+      - traefiknet
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
+  mongo_data:
+
+networks:
+  traefiknet:
+    driver: bridge
