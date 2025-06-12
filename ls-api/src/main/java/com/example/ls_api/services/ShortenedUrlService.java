@@ -24,7 +24,7 @@ public class ShortenedUrlService {
 
     private ShortenedUrlEntity findById(String id) {
         return repository.findById(id).orElseThrow(
-                () -> new RuntimeException("Usuário não encontrado"));
+                () -> new RuntimeException("User not found"));
     }
 
     public ShortenedUrlEntity findById(String id, String possibleErrorMessage,
@@ -53,7 +53,7 @@ public class ShortenedUrlService {
         String uuid;
 
         do {
-            uuid = "sl-" + UUID.randomUUID().toString().substring(0, 4);
+            uuid = UUID.randomUUID().toString().substring(0, 4);
         } while (repository.existsById(uuid));
 
         return uuid;

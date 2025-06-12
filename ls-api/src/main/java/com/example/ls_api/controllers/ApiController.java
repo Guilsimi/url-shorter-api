@@ -36,7 +36,7 @@ public class ApiController {
             @RequestBody UrlShortenRequest shortenRequest,
             HttpServletRequest request) {
 
-        String url = removeScheme(shortenRequest.url());
+        String url = verifyScheme(shortenRequest.url());
 
         ShortenedUrlEntity entity = urlService.findByOriginalUrl(url);
 
@@ -71,10 +71,9 @@ public class ApiController {
         return new UrlValidator().isValid(url);
     }
 
-    private String removeScheme(String url) {
-        if (url.contains("://")) {
-            String[] fields = url.split("://");
-            return fields[1];
+    private String verifyScheme(String url) {
+        if (!url.contains("://")) {
+            return "http://" + url;
         }
         return url;
     }

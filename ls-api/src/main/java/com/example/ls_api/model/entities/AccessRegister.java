@@ -14,6 +14,6 @@ import lombok.Setter;
 public class AccessRegister {
 
     private Instant accessDate;
-    private String shortLinkId;
+    private String shortLink;
 
 }

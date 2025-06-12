@@ -18,7 +18,7 @@ import jakarta.transaction.Transactional;
 
 @RestController
 @RequestMapping(value = "/li")
-public class ApplicationController {
+public class RedirectController {
 
     @Autowired
     private AccessInfoService accessService;
@@ -39,7 +39,7 @@ public class ApplicationController {
 
         urlService.updateClicksNumber(entity);
 
-        response.sendRedirect("http://" + entity.getOriginalUrl());
+        response.sendRedirect(entity.getOriginalUrl());
     }
 
 }

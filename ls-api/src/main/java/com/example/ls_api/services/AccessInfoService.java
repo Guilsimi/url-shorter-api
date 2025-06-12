@@ -32,14 +32,14 @@ public class AccessInfoService {
 
     private AccessInfoEntity findByIp(String ip) {
         return repository.findByIp(ip).orElseThrow(
-                () -> new RuntimeException("Informações de acesso não encontradas"));
+                () -> new RuntimeException("Access information not found"));
     }
 
     private void addAccessRegister(HttpServletRequest request) {
         AccessInfoEntity entity = findByIp(request.getRemoteAddr());
-        String requestUri = request.getRequestURI().replaceFirst("/", "");
+        String requestUri = request.getRequestURL().toString();
         AccessRegister register = entity.getAccessRegisters().stream()
-                .filter(reg -> reg.getShortLinkId().equals(requestUri)).findFirst().orElse(null);
+                .filter(reg -> reg.getShortLink().equals(requestUri)).findFirst().orElse(null);
 
         if (register == null) {
             entity.getAccessRegisters().add(new AccessRegister(Instant.now(),
@@ -53,7 +53,7 @@ public class AccessInfoService {
 
     private void createAccessInfoData(HttpServletRequest request) {
         AccessRegister register = new AccessRegister(Instant.now(),
-                request.getRequestURI().replaceFirst("/", ""));
+                request.getRequestURL().toString());
 
         AccessInfoEntity entity = new AccessInfoEntity(
                 request.getRemoteAddr(),
