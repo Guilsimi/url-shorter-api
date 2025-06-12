@@ -37,6 +37,11 @@ public class ShortenedUrlService {
         return repository.findAll();
     }
 
+    public void deleteLinkById(String shortCode) {
+        repository.delete(
+                findById(shortCode));
+    }
+
     public ShortenedUrlEntity createShortenedUrl(String url, HttpServletRequest req) {
         String id = generateId();
 
