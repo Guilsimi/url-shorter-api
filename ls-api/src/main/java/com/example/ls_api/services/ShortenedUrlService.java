@@ -78,21 +78,7 @@ public class ShortenedUrlService {
 
     public void updateClicksNumber(ShortenedUrlEntity entity) {
         entity.setClicks(entity.getClicks() + 1);
-        update(entity);
-    }
-
-    private void update(ShortenedUrlEntity newEntity) {
-        ShortenedUrlEntity oldEntity = findById(newEntity.getId());
-        updateData(oldEntity, newEntity);
-        repository.save(newEntity);
-    }
-
-    private ShortenedUrlEntity updateData(ShortenedUrlEntity oldEntity, ShortenedUrlEntity newEntity) {
-        return new ShortenedUrlEntity(
-                newEntity.getId() != null ? newEntity.getId() : oldEntity.getId(),
-                newEntity.getOriginalUrl() != null ? newEntity.getOriginalUrl() : oldEntity.getOriginalUrl(),
-                newEntity.getShortUrl() != null ? newEntity.getShortUrl() : oldEntity.getShortUrl(),
-                newEntity.getClicks() != null ? newEntity.getClicks() : oldEntity.getClicks());
+        repository.save(entity);
     }
 
 }

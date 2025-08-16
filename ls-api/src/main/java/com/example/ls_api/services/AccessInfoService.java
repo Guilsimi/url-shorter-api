@@ -26,15 +26,6 @@ public class AccessInfoService {
         }
     }
 
-    private boolean existsByIp(String ip) {
-        return repository.existsByIp(ip);
-    }
-
-    private AccessInfoEntity findByIp(String ip) {
-        return repository.findByIp(ip).orElseThrow(
-                () -> new RuntimeException("Access information not found"));
-    }
-
     private void addAccessRegister(HttpServletRequest request) {
         AccessInfoEntity entity = findByIp(request.getRemoteAddr());
         String requestUri = request.getRequestURL().toString();
@@ -44,10 +35,10 @@ public class AccessInfoService {
         if (register == null) {
             entity.getAccessRegisters().add(new AccessRegister(Instant.now(),
                     requestUri));
-            update(entity);
+            repository.save(entity);
         } else {
             register.setAccessDate(Instant.now());
-            update(entity);
+            repository.save(entity);
         }
     }
 
@@ -63,18 +54,13 @@ public class AccessInfoService {
         repository.save(entity);
     }
 
-    private void update(AccessInfoEntity newEntity) {
-        AccessInfoEntity oldEntity = findByIp(newEntity.getIp());
-        updateData(oldEntity, newEntity);
-        repository.save(newEntity);
+    private boolean existsByIp(String ip) {
+        return repository.existsByIp(ip);
     }
 
-    private AccessInfoEntity updateData(AccessInfoEntity oldEntity, AccessInfoEntity newEntity) {
-        return new AccessInfoEntity(
-                newEntity.getIp() != null ? newEntity.getIp() : oldEntity.getIp(),
-                newEntity.getUserAgent() != null ? newEntity.getUserAgent() : oldEntity.getUserAgent(),
-                newEntity.getAccessRegisters() != null ? newEntity.getAccessRegisters()
-                        : oldEntity.getAccessRegisters());
+    private AccessInfoEntity findByIp(String ip) {
+        return repository.findByIp(ip).orElseThrow(
+                () -> new RuntimeException("Access information not found"));
     }
 
 }

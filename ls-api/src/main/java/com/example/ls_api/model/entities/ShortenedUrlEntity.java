@@ -1,5 +1,7 @@
 package com.example.ls_api.model.entities;
 
+import com.example.ls_api.model.dto.ShortenedUrlDTO;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -30,5 +32,11 @@ public class ShortenedUrlEntity {
     private String shortUrl;
 
     private Integer clicks;
+
+    public ShortenedUrlEntity(ShortenedUrlDTO dto) {
+        this.originalUrl = dto.originalUrl();
+        this.shortUrl = dto.shortUrl();
+        this.clicks = dto.clicks();
+    }
 
 }
